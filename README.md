@@ -9,6 +9,8 @@ massive, affordable video data sets.
 This document will describe how to install and use VATIC. If you want to modify
 VATIC, please read DEVELOPERS after reading this document.
 
+![screenshot](screenshot.png)
+
 == INSTALLATION ===============================================================
 
 Note: VATIC has only been tested on Ubuntu with Apache 2.2 HTTP server and a
