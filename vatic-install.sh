@@ -1,11 +1,11 @@
 export MYSQL_PASSWORD=${MYSQL_PASSWORD:-hail_ukraine}
-export VAGRANT_INSTALL=${VAGRANT_INSTALL:-0}
+export INSTALL_WITH_EXAMPLE_DATA=${INSTALL_WITH_EXAMPLE_DATA:-false}
 export SERVER_NAME=${SERVER_NAME:-localhost}
 
 set -e
 
-if [[ "$VAGRANT_INSTALL" -eq "1" ]]; then 
-    echo "(!) Warning: doing vagrant style install (assuming empty box and being rude in actions)"
+if [[ "$INSTALL_WITH_EXAMPLE_DATA" -eq "true" ]]; then
+    echo "(!) Warning: doing aggressive install (assuming empty box just for us and being rude in actions)"
 fi;
 
 sudo apt-get update
@@ -16,7 +16,7 @@ sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again p
 
 sudo apt-get -y install mysql-server
 sudo apt-get install -y git python-setuptools python-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg62 libjpeg62-dev libfreetype6 libfreetype6-dev apache2 libapache2-mod-wsgi mysql-server mysql-client libmysqlclient-dev gfortran
-sudo apt-get install -y ffmpeg libav-tools
+sudo apt-get install -y libav-tools
 
 sudo easy_install -U SQLAlchemy pillow wsgilog mysql-python munkres parsedatetime argparse
 sudo easy_install -U numpy
@@ -38,12 +38,11 @@ cd pyvision
 sudo python setup.py install
 cd ..
 
-if [[ "$VAGRANT_INSTALL" -eq "1" ]]; then
+if [[ "$INSTALL_WITH_EXAMPLE_DATA" -eq "true" ]]; then
     sudo cp /etc/apache2/mods-available/headers.load /etc/apache2/mods-enabled
     mysql -u root -p$MYSQL_PASSWORD -e 'create database vatic;'
 
-
-    sudo cat > /etc/apache2/sites-enabled/000-default <<EOF
+    sudo bash -c "cat > /etc/apache2/sites-enabled/000-default" <<EOF
     WSGIDaemonProcess www-data
     WSGIProcessGroup www-data
 
@@ -57,8 +56,8 @@ if [[ "$VAGRANT_INSTALL" -eq "1" ]]; then
 
 EOF
 
-    cp vatic/config.py-example vatic/config.py
-    sed -ibak "s/root@localhost/root:$MYSQL_PASSWORD@localhost/g" vatic/config.py
+    sudo cp vatic/config.py-example vatic/config.py
+    sudo sed -ibak "s/root@localhost/root:$MYSQL_PASSWORD@localhost/g" vatic/config.py
 
     sudo apache2ctl graceful
 
@@ -67,9 +66,15 @@ EOF
     turkic setup --public-symlink
     turkic status --verify
 
-    wget -qO- localhost:80 > /dev/null \
-        && echo "Sudo we are rather done. Go to localhost:8080" \
-        || echo "Somethign went rather wrong and now you'll have to troubleshoot"
+    # setup demo dataset
+    mkdir -p /home/vagrant/vagrant_data/example
+    wget http://techslides.com/demos/sample-videos/small.mp4 -O /home/vagrant/vagrant_data/small.mp4
+    turkic extract /home/vagrant/vagrant_data/small.mp4 /home/vagrant/vagrant_data/example/
+    turkic load example_id /home/vagrant/vagrant_data/example/ example_label1 example_label2 example_label3 --offline
+
+    wget -qO- "http://localhost:80/?id=1&hitId=offline" > /dev/null \
+        && echo "We are rather done. Go to http://localhost:8080/?id=1&hitId=offline and see how this thing works" \
+        || echo "Something went rather wrong and now you'll have to troubleshoot"
 else
     echo "*****************************************************"
     echo "*** Please consult README to finish installation. ***"
