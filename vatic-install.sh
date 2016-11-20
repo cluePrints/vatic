@@ -1,5 +1,6 @@
 export MYSQL_PASSWORD=${MYSQL_PASSWORD:-hail_ukraine}
 export VAGRANT_INSTALL=${VAGRANT_INSTALL:-0}
+export SERVER_NAME=${SERVER_NAME:-localhost}
 
 set -e
 
@@ -46,7 +47,7 @@ if [[ "$VAGRANT_INSTALL" -eq "1" ]]; then
     WSGIProcessGroup www-data
 
     <VirtualHost *:80>
-        ServerName vatic.domain.edu
+        ServerName $SERVER_NAME
         DocumentRoot /home/vagrant/vatic/public
 
         WSGIScriptAlias /server /home/vagrant/vatic/server.py
@@ -60,10 +61,14 @@ EOF
 
     sudo apache2ctl graceful
 
+    cd vatic
     turkic setup --database
-    turkic setup --verify
+    turkic setup --public-symlink
+    turkic status --verify
 
-    echo "Sudo we are rather done. Go to localhost:8080 if you're lucky"
+    wget -qO- localhost:80 > /dev/null \
+        && echo "Sudo we are rather done. Go to localhost:8080" \
+        || echo "Somethign went rather wrong and now you'll have to troubleshoot"
 else
     echo "*****************************************************"
     echo "*** Please consult README to finish installation. ***"

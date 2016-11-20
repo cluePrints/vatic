@@ -1,4 +1,4 @@
-[![build status](https://travis-ci.org/cluePrints/vatic.svg)(https://travis-ci.org/cluePrints/vatic)]
+[![build status](https://travis-ci.org/cluePrints/vatic.svg)](https://travis-ci.org/cluePrints/vatic)
 
 VATIC - Video Annotation Tool from Irvine, California
 
