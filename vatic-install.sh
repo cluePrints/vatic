@@ -10,6 +10,12 @@ fi;
 
 sudo apt-get update
 
+echo "Packages installed"
+sudo dpkg -l
+
+echo "Mysql-related installed"
+sudo dpkg -l | grep mysql
+
 # set some mysql password so we can proceed without interactive prompt for it
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWORD"
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD"
