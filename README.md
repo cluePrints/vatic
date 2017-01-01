@@ -11,13 +11,19 @@ VATIC, please read DEVELOPERS after reading this document.
 
 ![screenshot](screenshot.png)
 
-== INSTALLATION ===============================================================
+# INSTALLATION 
 
 Note: VATIC has only been tested on Ubuntu with Apache 2.2 HTTP server and a
 MySQL server. This document will describe installation on this platform,
 however it should work any operating system and with any server.
 
---- Download ------------------------------------------------------------------
+Supplied Vagrant file allows you to quickly spin a VM using vagrant:
+
+    vagrant up
+
+Otherwise you can follow the manual steps described below and peek into `vatic-install.sh`
+
+## Download
 
 You can download and extract VATIC from our website. Note: do NOT run the 
 installer as root. 
@@ -27,7 +33,7 @@ installer as root.
     $ ./vatic-install.sh
     $ cd vatic
 
---- HTTP Server Configuration -------------------------------------------------
+## HTTP Server Configuration 
 
 Open the Apache configuration file. On Ubuntu, this file is located at:
 
@@ -61,7 +67,7 @@ After making these changes, restart Apache:
 
     $ sudo apache2ctl graceful
 
---- SQL Server Configuration --------------------------------------------------
+## SQL Server Configuration 
 
 We recommend creating a separate database specifically for VATIC:
 
@@ -70,7 +76,7 @@ We recommend creating a separate database specifically for VATIC:
 
 The next section will automatically create the necessary tables.
 
---- Setup ---------------------------------------------------------------------
+## Setup
 
 Inside the vatic directory, copy config.py-example to config.py:
 
@@ -105,7 +111,7 @@ Finally, you must also allow VATIC to access turkic, a major dependency:
 
     $ turkic setup --public-symlink
 
-== ANNOTATION =================================================================
+# ANNOTATION 
 
 Before you continue, you should verify that the installation was correct. You
 can verify this with:
@@ -117,7 +123,7 @@ and you should review the previous section. Note: If you do not plan on
 using Mechanical Turk, you can safely ignore any errors caused by Mechanical
 Turk.
 
---- Frame Extraction ----------------------------------------------------------
+## Frame Extraction 
 
 Our system requires that videos are extracted into JPEG frames. Our tool can 
 do this automatically for you:
@@ -147,7 +153,7 @@ formatframes command to format the video into a format that VATIC understands:
 The above command will read all the images in /path/to/frames and create
 hard links (soft copy) in /path/to/output/directory.
 
---- Importing a Video ---------------------------------------------------------
+## Importing a Video
 
 After extracting frames, the video can be imported into our tool for 
 annotation. The general syntax for this operation is:
@@ -212,7 +218,7 @@ In the above example, Label1 will have attributes Attr1A and Attr1B, Label2
 will have attributes Attr2B, Attr2B, and Attr2C and Label3 will have no 
 attributes. Specifying attributes is optional.
 
---- Gold Standard Training ---------------------------------------------------
+## Gold Standard Training
 
 It turns out that video annotation is extremely challenging and most MTurk
 workers lack the necessary patience. For this reason, we recommend requiring
@@ -253,7 +259,8 @@ You can now specify that a video should use a gold standard video:
 When a not-yet-seen worker visits this video, they will now be redirected to
 to the training video and be required to pass the evaluation test first.
 
---- Publishing Tasks ---------------------------------------------------------
+
+## Publishing Tasks 
 
 When you are ready for the MTurk workers to annotate, you must publish the 
 tasks, which will allow workers to start annotating:
@@ -300,7 +307,7 @@ When all the videos are annotated, the last line will read:
 
     Server is offline.
 
---- Retrieving Annotations ---------------------------------------------------
+## Retrieving Annotations
 
 You can get all the annotations for a video with the command:
 
@@ -356,7 +363,7 @@ The command can also output to many different formats. Available formats are:
 
 The specifications for these formats should be self explanatory.
 
---- Visualizing Videos -------------------------------------------------------
+## Visualizing Videos
 
 You can preview the annotations by visualizing the results:
 
@@ -380,7 +387,7 @@ specify the --labels option:
 
     $ turkic visualize identifier /tmp --labels
 
---- Compensating Workers -----------------------------------------------------
+## Compensating Workers
 
 When you are ready, you can compensate workers:
 
@@ -390,7 +397,7 @@ which will pay all workers for all outstanding tasks. We strongly recommend
 paying all workers regardless of their quality. You should attempt to pay
 workers at least once per day.
 
---- Finding Jobs -------------------------------------------------------------
+## Finding Jobs 
 
 If you have found a small mistake in a video and want to make
 the correction yourself, you can start an annotation session initialized with
@@ -459,7 +466,7 @@ You can also invalidate and respawn individual jobs with the command:
     $ turkic invalidate --hit hitid
 
 
---- Listing all Videos -------------------------------------------------------
+## Listing all Videos 
 
 You can retrieve a list of all videos in the system with:
 
@@ -487,8 +494,7 @@ If you want statistics about each video, then give the --stats option:
 
     $ turkic list --stats
 
---- Managing Workers ---------------------------------------------------------
-
+## Managing Workers 
 You can list all known workers with the command:
 
     $ turkic workers
@@ -503,7 +509,7 @@ You can also search for workers by the first few letters of their ID:
 
     $ turkic workers --search A3M
 
---- Deleting a Video ---------------------------------------------------------
+## Deleting a Video
 
 You can delete a video at any time with:
 
@@ -516,7 +522,8 @@ warn you and abort. You can force deletion with:
 
 which will REMOVE ALL DATA AND CANNOT BE UNDONE.
 
-== REFERENCES =================================================================
+
+# REFERENCES 
 
 When using our system, please cite:
 
@@ -524,7 +531,7 @@ When using our system, please cite:
     Crowdsourced Video Annotation" International Journal of Computer Vision
     (IJCV). June 2012.
 
-== FEEDBACK AND BUGS ==========================================================
+# FEEDBACK AND BUGS
 
 Please direct all comments and report all bugs to:
 
