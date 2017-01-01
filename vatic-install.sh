@@ -20,8 +20,7 @@ sudo dpkg -l | grep mysql
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWORD"
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD"
 
-sudo apt-get -y install mysql-server-5.6
-sudo apt-get install -y git python-setuptools python-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg62 libjpeg62-dev libfreetype6 libfreetype6-dev apache2 libapache2-mod-wsgi mysql-server mysql-client libmysqlclient-dev gfortran
+sudo apt-get install -y git python-setuptools python-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg62 libjpeg62-dev libfreetype6 libfreetype6-dev apache2 libapache2-mod-wsgi mysql-server-5.6 mysql-client-5.6 libmysqlclient-dev gfortran
 sudo apt-get install -y libav-tools
 
 sudo easy_install -U SQLAlchemy pillow wsgilog mysql-python munkres parsedatetime argparse
