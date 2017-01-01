@@ -1,5 +1,5 @@
 dist: trusty
 sudo: required
 env:
-  - INSTALL_WITH_EXAMPLE_DATA=true
+  - INSTALL_WITH_EXAMPLE_DATA=true MYSQL_PASSWORD=""
 script: ./vatic-install.sh

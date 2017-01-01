@@ -1,4 +1,4 @@
-export MYSQL_PASSWORD=${MYSQL_PASSWORD:-hail_ukraine}
+export MYSQL_PASSWORD=${MYSQL_PASSWORD-hail_ukraine}
 export INSTALL_WITH_EXAMPLE_DATA=${INSTALL_WITH_EXAMPLE_DATA:-false}
 export SERVER_NAME=${SERVER_NAME:-localhost}
 
@@ -10,12 +10,32 @@ fi;
 
 sudo apt-get update
 
-# set some mysql password so we can proceed without interactive prompt for it
-sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWORD"
-sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD"
+install_mysql() {
+  # set some mysql password so we can proceed without interactive prompt for it
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWORD"
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD"
 
-sudo apt-get -y install mysql-server
-sudo apt-get install -y git python-setuptools python-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg62 libjpeg62-dev libfreetype6 libfreetype6-dev apache2 libapache2-mod-wsgi mysql-server mysql-client libmysqlclient-dev gfortran
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server mysql-client
+}
+
+run_mysql_command() {
+  if [ "${MYSQL_PASSWORD}" == "" ]
+  then
+    PASSWORD_EXPRESSION=""
+  else
+    PASSWORD_EXPRESSION="-p${MYSQL_PASSWORD}"
+  fi
+
+  mysql -u root $PASSWORD_EXPRESSION -e "$1"
+}
+
+# skip mysql installation if already there - true for Travis
+dpkg --get-selections | grep mysql || install_mysql
+
+# testing db password settings early in the build
+run_mysql_command 'select now() from dual;'
+
+sudo apt-get install -y git python-setuptools python-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg62 libjpeg62-dev libfreetype6 libfreetype6-dev apache2 libapache2-mod-wsgi libmysqlclient-dev gfortran
 sudo apt-get install -y libav-tools
 
 sudo easy_install -U SQLAlchemy pillow wsgilog mysql-python munkres parsedatetime argparse
@@ -40,7 +60,7 @@ cd ..
 
 if [[ "$INSTALL_WITH_EXAMPLE_DATA" -eq "true" ]]; then
     sudo cp /etc/apache2/mods-available/headers.load /etc/apache2/mods-enabled
-    mysql -u root -p$MYSQL_PASSWORD -e 'create database vatic;'
+    run_mysql_command 'create database vatic;'
 
     sudo bash -c "cat > /etc/apache2/sites-enabled/000-default" <<EOF
     WSGIDaemonProcess www-data
